@@ -1,19 +1,26 @@
 <template>
 
   <div>
-    <h1 v-html="this.question">
 
-    </h1>
+    <template v-if="this.question">
 
-    <input type="radio" name="options" value="True">
-    <label>True</label> <br>
+      <h1 v-html="this.question">
+      </h1>
+  
+      <template v-for="(answer, index) in this.answers" :key="index">
+        
+        <input type="radio" name="options" :value="answer" v-model="this.chosen_answer" >
+        <label v-html="answer"></label> <br>
+  
+      </template>
+  
+      <button @click="this.submitAnswer()" class="send" type="button">Send</button>
 
-    <input type="radio" name="options" value="False">
-    <label>False</label> <br>
+    </template>
 
-    <button class="send" type="button">Send</button>
 
   </div>
+
 </template>
 
 <script>
@@ -26,17 +33,35 @@ export default {
       question: undefined,
       incorrectAnswers: undefined,
       correctAnswer: undefined,
-
+      chosen_answer: undefined,
+      answerSubmitted: false,
     }
   },
 
   computed: {
     answers(){
       var answers = [...this.incorrectAnswers];
-      answers.push(this.correctAnswer);
+      answers.splice(Math.round(Math.random() * answers.length), 0, this.correctAnswer);
       return answers;
     }
   },
+
+  methods: {
+    submitAnswer(){
+      if(!this.chosen_answer){
+        alert('Escolha uma opção');
+      } else {
+        if(this.chosen_answer == this.correctAnswer){
+          alert('Você acertou!');
+        } else {
+          alert('Você Errou');
+        }
+      }
+    }
+  },
+
+
+
   created(){
     this.axios
     .get('https://opentdb.com/api.php?amount=1&category=18&difficulty=easy')
